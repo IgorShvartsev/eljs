@@ -27,12 +27,47 @@ export default (() => {
             return this.#el;
         }
 
+        eq(index) {
+            return new ElementCollection(this.#el[index] ?? []);
+        }
+
         get(index = 0) {
             return this.#el[index] ?? null;
         }
 
         length() {
             return this.#el.length;
+        }
+
+        add(selector) {
+            let collection = []
+            if (!Array.isArray(selector)) {
+                selector = [selector];
+            }
+            selector.forEach(element => {
+                if (element instanceof Element ) {
+                    collection.push(element);
+                } else {
+                    collection = [...collection, ...document.querySelectorAll(selector)];
+                }
+            });
+            return new ElementCollection([...new Set([...this.#el, ...collection])]);
+        }
+
+        not(selector) {
+            let sourceCollection = [];
+            if (!Array.isArray(selector)) {
+                selector = [selector];
+            }
+            selector.forEach((el) => {
+                if (el instanceof Element) {
+                    sourceCollection.push(el);
+                } else {
+                    sourceCollection.push(...document.querySelectorAll(el));
+                }
+            });
+            const collection = this.#el.filter((element) => !sourceCollection.includes(element));
+            return new ElementCollection([...new Set(collection)]);
         }
 
         addAttr(attr, v) {
@@ -48,6 +83,10 @@ export default (() => {
         removeAttr (attr) {
             this.#handleCollection((el) => el.removeAttribute(attr));
             return this;
+        }
+
+        getAttr(attr) {
+            return this.#el.length && this.#el[0].hasAttribute(attr) ? this.#el[0].getAttribute(attr) : '';
         }
 
         addClass(...className) {
@@ -102,23 +141,34 @@ export default (() => {
             return this;
         }
 
-        before(element) {
-            this.#attachCommand('before', element);
-            return this;
-        }
-
         after(element) {
             this.#attachCommand('after', element);
             return this;
         }
 
-        parent() {
-            const collection = this.#el.map(el => el.parentElement);
+        before(element) {
+            this.#attachCommand('before', element);
+            return this;
+        }
+
+        children(selector) {
+            let collection = [];
+            this.#handleCollection((el) => {
+                let children = [...el.children].filter(child => !selector || child.matches(selector));
+                if (children.length) {
+                    collection.push(...children);
+                }
+            });
             return new ElementCollection([...new Set(collection)]);
         }
 
         closest(selector) {
             const collection = this.#el.map(el => el.closest(selector));
+            return new ElementCollection([...new Set(collection)]);
+        }
+
+        parent() {
+            const collection = this.#el.map(el => el.parentElement);
             return new ElementCollection([...new Set(collection)]);
         }
 
@@ -133,24 +183,6 @@ export default (() => {
             return new ElementCollection([...new Set(collection)]);
         }
 
-        children(selector) {
-            let collection = [];
-            this.#handleCollection((el) => {
-                let children = [...el.children].filter(child => !selector || child.matches(selector));
-                if (children.length) {
-                    collection.push(...children);
-                }
-            });
-            return new ElementCollection([...new Set(collection)]);
-        }
-
-        each(cb) {
-            if (typeof cb === 'function') {
-                this.#el.forEach((el, index) => cb.call(el, el, index));
-            }
-            return this;
-        }
-
         match(selector) {
             let result = false;
             this.#handleCollection((el) => {
@@ -162,21 +194,24 @@ export default (() => {
             return result;
         }
 
-        isVisible() {
-            return this.#el.length 
-                ? this.#el[0].checkVisibility({
-                    opacityProperty: true,
-                    visibilityProperty: true,
-                })
-                : false;
-        }
-
         first() {
             return new ElementCollection(this.#el.length ? this.#el[0] : []);
         }
 
         last() {
             return new ElementCollection(this.#el.length ? this.#el[this.#el.length - 1] : []);
+        }
+
+        prevUntil(selector) {
+            let collection = [];
+            this.#handleCollection((el) => {
+                el = el.previousElementSibling;
+                while (el && (!selector || !el.matches(selector))) {
+                    collection.push(el);
+                    el = el.previousElementSibling;
+                }
+            });
+            return new ElementCollection([...new Set(collection)]);
         }
 
         find(selector) {
@@ -192,6 +227,13 @@ export default (() => {
 
         filter(cb) {
             return new ElementCollection(typeof cb === 'function' ? this.#el.filter(cb) : []);
+        }
+
+        each(cb) {
+            if (typeof cb === 'function') {
+                this.#el.forEach((el, index) => cb.call(el, el, index));
+            }
+            return this;
         }
 
         html(content) {
@@ -216,7 +258,7 @@ export default (() => {
                     try {
                         result = JSON.parse(this.#el[0].dataset[name]);
                     } catch(error) {
-                        result = this.#el[0].dataset[name];
+                        result = this.#el[0].dataset[name] ?? '';
                     }
                 }
                 return result;
@@ -230,7 +272,7 @@ export default (() => {
             return this;
         }
 
-        clear() {
+        remove() {
             this.#handleCollection((el) => el.remove());
             return this;
         }
@@ -250,24 +292,59 @@ export default (() => {
             return this;
         }
 
-        event(type, cb) {
+        isVisible() {
+            return this.#el.length 
+                ? this.#el[0].checkVisibility({
+                    opacityProperty: true,
+                    visibilityProperty: true,
+                })
+                : false;
+        }
+
+        childIndex() {
+            return this.#el.length && this.#el[0].parentNode 
+                ? [...this.#el[0].parentNode.children].indexOf(this.#el[0])
+                : -1;
+        }
+
+        prop(name) {
+            if (!this.#el.length) {
+                return null;
+            }
+            const el = this.#el[0];
+            if (name in el) {
+                return typeof el[name] !== 'function' ? el[name] : null;
+            }
+            const compStyle = window.getComputedStyle(el);
+            const result = compStyle.getPropertyValue(name);
+            const matches = result.match(/^([0-9.]+)/);
+            return matches ? (matches[1] * 1) : result;
+        }
+
+        event(type, cb, option) {
             this.#handleCollection((el) => {
                 if (typeof cb === 'function') {
-                    el.addEventListener(type, cb);
+                    el.addEventListener(type, cb, typeof option === 'boolean' || typeof option === 'object' ? option : false);
                 }
             });
             return this;
         }
 
-        on(type, selector, cb) {
+        on(type, selector, cb, option) {
             this.#handleCollection((el) => {
                 if (typeof cb === 'function') {
                     let target = selector;
-                    el.addEventListener(type, (e) => {
-                        if (el.querySelector(target) === e.target) {
-                            cb.call(e.target, e);
-                        }
-                    });
+                    el.addEventListener(
+                        type, 
+                        (e) => {
+                            el.querySelectorAll(target).forEach(element => {
+                                if (element === e.target) {
+                                    cb.call(e.target, e);
+                                }
+                            });
+                        }, 
+                        typeof option === 'boolean' || typeof option === 'object' ? option : false
+                    );
                 }
             });
             return this;
