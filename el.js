@@ -10,6 +10,8 @@ export default (() => {
 
     const create = (tag) => new ElementCollection(document.createElement(tag));
 
+    const fromHtml = (html) => new ElementCollection((new DOMParser()).parseFromString(html, 'text/html').body.firstChild);
+    
     const q = (selector) => new ElementCollection(
         selector instanceof Element 
             ? selector 
@@ -214,6 +216,28 @@ export default (() => {
             return new ElementCollection([...new Set(collection)]);
         }
 
+        prev() {
+            let collection = [];
+            this.#handleCollection((el) => {
+                el = el.previousElementSibling;
+                if (el) {
+                    collection.push(el);
+                }
+            });
+            return new ElementCollection([...new Set(collection)]);
+        }
+
+        next() {
+            let collection = [];
+            this.#handleCollection((el) => {
+                el = el.nextElementSibling;
+                if (el) {
+                    collection.push(el);
+                }
+            });
+            return new ElementCollection([...new Set(collection)]);
+        }
+
         find(selector) {
             let collection = [];
             this.#handleCollection((el) => {
@@ -245,8 +269,11 @@ export default (() => {
         }
 
         text(content) {
+            if (typeof content === 'undefined') {
+                return this.#el.length ? this.#el[0].textContent : '';
+            }
             if (content) {            
-                this.#handleCollection((el) => el.appendChild(document.createTextNode(content)));
+                this.#handleCollection((el) => el.textContent = content);
             }
             return this;
         }
@@ -321,6 +348,27 @@ export default (() => {
             return matches ? (matches[1] * 1) : result;
         }
 
+        offset() {
+            const result = {top: 0, left: 0};
+            if (this.#el.length) {  
+                const {top, left} = this.#el[0].getBoundingClientRect();
+                result.top = top + window.scrollY;
+                result.left = left + window.scrollX; 
+            }
+            return result;
+        }
+
+        position() {
+            const result = {top: 0, left: 0};
+            if (this.#el.length) {
+                const {marginTop, marginLeft} = window.getComputedStyle(this.#el[0])                
+                const {top, left} = this.#el[0].getBoundingClientRect();
+                result.top = top - parseFloat(marginTop);
+                result.left = left - parseFloat(marginLeft);
+            }
+            return result;
+        }
+
         event(type, cb, option) {
             this.#handleCollection((el) => {
                 if (typeof cb === 'function') {
@@ -335,14 +383,13 @@ export default (() => {
                 if (typeof cb === 'function') {
                     let target = selector;
                     el.addEventListener(
-                        type, 
+                        type,
                         (e) => {
-                            el.querySelectorAll(target).forEach(element => {
-                                if (element === e.target) {
-                                    cb.call(e.target, e);
-                                }
-                            });
-                        }, 
+                            const closest = e.target.closest(target);
+                            if (closest && el.contains(closest)) {
+                                cb.call(closest, e);
+                            }
+                        },
                         typeof option === 'boolean' || typeof option === 'object' ? option : false
                     );
                 }
@@ -417,5 +464,5 @@ export default (() => {
         }
     }
 
-    return {create, q};
+    return {create, fromHtml, q};
 })();

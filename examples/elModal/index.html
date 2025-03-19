@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-Us>">
+<head>
+    <title>ElModal</title>
+    <meta charset="utf-8" /> 
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0"/>
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="X-UA-Compatible"  content="IE=edge, chrome=1" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css" type="text/css" />
+</head>
+<body>
+    <style>
+        #modal {
+            opacity:0;
+            display:flex;
+            justify-content:center;
+        }
+        .closebt:hover {
+            transform: rotate(90deg);
+        }
+        .closebt {
+            transition: all 0.2s;
+            cursor: pointer;
+            display: block;
+            margin: 8px;
+            position: absolute;
+            right: 0px;
+            top: 0.2rem;
+        }
+    </style>
+    <div class="container">
+        <div id="modal">
+            <div class="close-modal">
+                <img class="closebt" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHdpZHRoPSI1MnB4IiBoZWlnaHQ9IjUycHgiIHZpZXdCb3g9IjAgMCA1MiA1MiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNTIgNTIiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8Zz4KCTxjaXJjbGUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQ0NDQ0NDIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgY3g9IjI2IiBjeT0iMjYiIHI9IjI1Ii8+Cgk8Zz4KCQk8bGluZSBmaWxsPSJub25lIiBzdHJva2U9IiNDQ0NDQ0MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiB4MT0iMzMuNTcxIiB5MT0iMzQuMjc4IiB4Mj0iMTguNzIyIiB5Mj0iMTkuNDI5Ii8+CgkJPGxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQ0NDQ0NDIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgeDE9IjMzLjU3MSIgeTE9IjE4LjcyMiIgeDI9IjE4LjcyMiIgeTI9IjMzLjU3MSIvPgoJPC9nPgo8L2c+Cjwvc3ZnPgo="/>
+            </div>
+            <form style="padding-top:5rem;">
+                <div class="row mb-4">
+                    <div class="col">
+                        <div class="form-outline">
+                            <input type="text" id="form6Example1" class="form-control" />
+                            <label class="form-label" for="form6Example1">First name</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-outline">
+                            <input type="text" id="form6Example2" class="form-control" />
+                            <label class="form-label" for="form6Example2">Last name</label>
+                        </div>
+                    </div>
+                </div>
+              
+                <div class="form-outline mb-4">
+                    <input type="text" id="form6Example3" class="form-control" />
+                    <label class="form-label" for="form6Example3">Company name</label>
+                </div>
+              
+                <div class="form-outline mb-4">
+                    <input type="text" id="form6Example4" class="form-control" />
+                    <label class="form-label" for="form6Example4">Address</label>
+                </div>
+              
+                <div class="form-outline mb-4">
+                    <input type="email" id="form6Example5" class="form-control" />
+                    <label class="form-label" for="form6Example5">Email</label>
+                </div>
+              
+                <div class="form-outline mb-4">
+                    <input type="text" id="form6Example6" class="form-control" />
+                    <label class="form-label" for="form6Example6">Phone</label>
+                </div>
+              
+                <div class="form-outline mb-4">
+                    <textarea class="form-control" id="form6Example7" rows="4"></textarea>
+                    <label class="form-label" for="form6Example7">Additional information</label>
+                </div>
+              
+                <div class="form-check d-flex justify-content-center mb-4">
+                    <input
+                        class="form-check-input me-2"
+                        type="checkbox"
+                        value=""
+                        id="form6Example8"
+                        checked
+                    />
+                    <label class="form-check-label" for="form6Example8"> Create an account? </label>
+                </div>
+              
+                <button type="button" id="submit-btn" class="btn btn-primary btn-block mb-4" onclick="document.querySelector('.close-modal').click()">Place order</button>
+            </form>
+        </div>
+
+        <div class="m-4 text-center">
+            <p>Click on the button below to open the modal.</p>
+            <!--<a id="modal-link" href="#modal">Open Modal</a> -->
+            <button id="modal-btn" type="button" class="btn btn-primary" data-modal-selector="modal">Open Modal</button>
+        </div>
+
+        <script type="module">
+            import { default as elModal } from './elModal.js';
+
+            const modalOptions = {
+                animatedIn: 'fadeInDown',
+                animatedOut: 'fadeOutUp',
+                //color: '#d3edf1',
+                beforeOpen: function () {
+                    // The animation was called before open;
+                },
+                afterOpen: function () {
+                    // The animation is completed after open;
+                },
+                beforeClose: function () {
+                    // The animation was called before close;
+                },
+                afterClose: function () {
+                },
+            };
+
+            elModal.init('#modal-btn', modalOptions);
+            // const Modal = elModal.init('#modal', modalOptions);
+            // Modal.launch();
+        </script>
+    </div>
+</body>
+</html>
